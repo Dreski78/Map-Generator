@@ -22,8 +22,8 @@ def create_rain(amount):
         active_rain.append(Rain([random.randrange(WIDTH), 0]))
 
 
-WIDTH = 720
-HEIGHT = 360
+WIDTH = 1366
+HEIGHT = 768
 
 active_rain = []
 

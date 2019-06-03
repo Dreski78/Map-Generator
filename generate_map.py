@@ -124,9 +124,9 @@ class Map:
 
 if __name__ == '__main__':
 
-    WIDTH, HEIGHT = 720, 480
-    cell_size = 1
-    map = Map(WIDTH // cell_size, HEIGHT // cell_size)
+    WIDTH, HEIGHT = 1366, 768
+    cell_size = 4
+    map = Map(WIDTH, HEIGHT, cell_size)
 
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
