@@ -5,27 +5,12 @@ from Things import *
 import pygame
 from pygame.locals import *
 
-def resolve(matchup):
-    global living_things
-    if all(type(thing) is Predator for thing in matchup):
-        return
-    if all(type(thing) is Prey for thing in matchup):
-        return
-
-    for thing in matchup:
-        if type(thing) is Prey:
-            living_things.append(Predator(world, thing.position.copy()))
-            living_things.remove(thing)
-            matchup.remove(thing)
-
-        elif type(thing) is Predator:
-            thing.hp += 20
-
 if __name__ == '__main__':
 
-    WIDTH = 1366
-    HEIGHT = 768
-    cell_size = 4
+    WIDTH = 1600
+    HEIGHT = 900
+    cell_size = 8
+    thing_size = 5
 
     MAX_THINGS = ((HEIGHT // cell_size) * (WIDTH // cell_size))
     MAX_THINGS *= .04
@@ -37,7 +22,7 @@ if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-    starting_things = [Prey(world, None) for i in range(5)] + [Predator(world, None) for i in range(5)]
+    starting_things = [Thing(world, None, thing_size) for i in range(5)]
 
     living_things = []
     living_things += starting_things
@@ -83,7 +68,6 @@ if __name__ == '__main__':
         if keys[K_s]:
             camera_offset[1] -= 1
 
-
         for cell in world.affected_cells:
             pygame.draw.rect(screen, cell.color,
                              (((cell.position[0] + camera_offset[0]) * cell_size) * scale_offset,
@@ -96,23 +80,10 @@ if __name__ == '__main__':
         for thing in living_things:
             thing.update(world)
             pygame.draw.rect(screen, thing.color,
-                             (((thing.position[0] + camera_offset[0]) * cell_size) * scale_offset,
-                              ((thing.position[1] + camera_offset[1]) * cell_size) * scale_offset,
-                              cell_size * scale_offset,
-                              cell_size * scale_offset))
-
-        for cell in world.affected_cells:
-            if len(cell.contains) > 1:
-                resolve(cell.contains)
-
-
-        for thing in living_things:
-            thing.conclude(world, living_things)
-
-        if not any(type(thing) is Predator for thing in living_things):
-            living_things.append(Predator(world, None))
-        if not any(type(thing) is Prey for thing in living_things):
-            living_things.append(Prey(world, None))
+                             ((thing.position[0] + camera_offset[0]) * scale_offset,
+                              (thing.position[1] + camera_offset[1]) * scale_offset,
+                              thing_size * scale_offset,
+                              thing_size * scale_offset))
 
         if len(living_things) > MAX_THINGS:
             for thing in random.sample(living_things, len(living_things) - MAX_THINGS):

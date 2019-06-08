@@ -12,6 +12,7 @@ class Cell:
         self.color = 0
         self.is_water = False
         self.contains = []
+        self.resources = []
 
     def __iter__(self):
         return len(self.contains) > 1
@@ -40,6 +41,7 @@ class Map:
     def __init__(self, w, h, cell_size):
         self.width = w // cell_size
         self.height = h // cell_size
+        self.cell_size = cell_size
         self.grid = [[Cell([x, y]) for y in range(self.height)] for x in range(self.width)]
         self.cells = [cell for row in self.grid for cell in row]
         self.make_ocean()
@@ -47,8 +49,13 @@ class Map:
         self.set_color()
         self.non_ocean = [cell for cell in self.cells if cell.is_water is False]
         self.affected_cells = []
+        self.resources = []
+        self.make_resources()
+
+
         print(len(self.cells))
         print(len(self.non_ocean))
+        print(self.width, self.height)
 
     def make_ocean(self):
         wmin = 0 + self.width // 50
@@ -120,6 +127,50 @@ class Map:
             elif cell.height > 180:
                 cell.color = (215, 255, 215)
 
+    def make_resources(self, num=30):
+        resources = []
+        for i in range(num):
+            resources.append(Resource(self, None, resources))
+
+        self.resources = resources
+
+
+class Resource:
+
+    def __init__(self, world, pos, resources):
+        if pos is None:
+            pos = random.sample(world.non_ocean, 1)[0]
+            Found = False
+
+            while not Found:
+                if len(resources) == 0:
+                    Found = True
+
+                count = 0
+                for resource in resources:
+                    if pos in resource.get_neighbors(20, world):
+                        pos = random.sample(world.non_ocean, 1)[0]
+                    else:
+                        count += 1
+
+                if count == len(resources):
+                    Found = True
+
+        pos.resources.append(self)
+        self.position = [(pos.position[0] * world.cell_size) + random.randrange(world.cell_size),
+                         (pos.position[1] * world.cell_size) + random.randrange(world.cell_size)]
+        self.color = (0, 0, 0)
+        self.worth = 5
+
+    def get_neighbors(self, reach, world):
+        neighbors = []
+        for row in range(self.position[0] - reach, self.position[0] + reach + 1):
+            for col in range(self.position[1] - reach, self.position[1] + reach + 1):
+                try:
+                    neighbors.append(world.grid[row][col])
+                except:
+                    pass
+        return neighbors
 
 
 if __name__ == '__main__':
